@@ -5,60 +5,114 @@
 package common
 
 import (
-	"errors"
+	"bytes"
 	"fmt"
+	"regexp"
+	"strconv"
 )
 
-// Portable analogs of some common call errors.
-var (
-	ErrBadConn       = errors.New("connection was bad")
-	ErrMalformPacket = errors.New("malform packet error")
+const (
+	// SQLStateGeneral is the SQLSTATE valueImpl for "general error".
+	SQLStateGeneral = "HY000"
 )
 
-// SQLError records an error information, from executing SQL.
+// SQLError is the error structure returned from calling a db library function
 type SQLError struct {
-	Code    uint16
-	Message string
+	Num     uint16
 	State   string
+	Message string
+	Query   string
 }
 
-// Error prints errors, with a formatted string.
-func (e *SQLError) Error() string {
-	return fmt.Sprintf("ERROR %d (%s): %s", e.Code, e.State, e.Message)
+func NewSQLError(number uint16, format string, args ...interface{}) *SQLError {
+	sqlErr := &SQLError{}
+	err, ok := SQLErrors[number]
+	if !ok {
+		unknow := SQLErrors[ER_UNKNOWN_ERROR]
+		sqlErr.Num = unknow.Num
+		sqlErr.State = unknow.State
+	} else {
+		sqlErr.Num = err.Num
+		sqlErr.State = err.State
+	}
+
+	if format != "" {
+		sqlErr.Message = fmt.Sprintf(format, args...)
+	} else {
+		sqlErr.Message = fmt.Sprintf(err.Message, args...)
+	}
+	return sqlErr
 }
 
-// NewErr generates a SQL error, with an error code and default format specifier defined in MySQLErrName.
-func NewErr(errCode uint16, args ...interface{}) *SQLError {
-	e := &SQLError{Code: errCode}
-
-	if s, ok := MySQLState[errCode]; ok {
-		e.State = s
-	} else {
-		e.State = DefaultMySQLState
+func NewSQLError1(number uint16, state string, format string, args ...interface{}) *SQLError {
+	return &SQLError{
+		Num:     number,
+		State:   state,
+		Message: fmt.Sprintf(format, args...),
 	}
-
-	if sqlErr, ok := MySQLErrName[errCode]; ok {
-		//errors.RedactErrorArg(args, sqlErr.RedactArgPos)
-		e.Message = fmt.Sprintf(sqlErr.Raw, args...)
-	} else {
-		e.Message = fmt.Sprint(args...)
-	}
-
-	return e
 }
 
-// NewErrf creates a SQL error, with an error code and a format specifier.
-func NewErrf(errCode uint16, format string, redactArgPos []int, args ...interface{}) *SQLError {
-	e := &SQLError{Code: errCode}
+// Error implements the error interface
+func (se *SQLError) Error() string {
+	buf := &bytes.Buffer{}
+	buf.WriteString(se.Message)
 
-	if s, ok := MySQLState[errCode]; ok {
-		e.State = s
-	} else {
-		e.State = DefaultMySQLState
+	// Add MySQL errno and SQLSTATE in a format that we can later parse.
+	// There's no avoiding string parsing because all errors
+	// are converted to strings anyway at RPC boundaries.
+	// See NewSQLErrorFromError.
+	fmt.Fprintf(buf, " (errno %v) (sqlstate %v)", se.Num, se.State)
+
+	if se.Query != "" {
+		fmt.Fprintf(buf, " during plan: %s", se.Query)
+	}
+	return buf.String()
+}
+
+var errExtract = regexp.MustCompile(`.*\(errno ([0-9]*)\) \(sqlstate ([0-9a-zA-Z]{5})\).*`)
+
+// NewSQLErrorFromError returns a *SQLError from the provided error.
+// If it's not the right type, it still tries to get it from a regexp.
+func NewSQLErrorFromError(err error) error {
+	if err == nil {
+		return nil
 	}
 
-	//errors.RedactErrorArg(args, redactArgPos)
-	e.Message = fmt.Sprintf(format, args...)
+	if serr, ok := err.(*SQLError); ok {
+		return serr
+	}
 
-	return e
+	msg := err.Error()
+	match := errExtract.FindStringSubmatch(msg)
+	if len(match) < 2 {
+		// Not found, build a generic SQLError.
+		// TODO(alainjobart) maybe we can also check the canonical
+		// error code, and translate that into the right error.
+
+		// FIXME(alainjobart): 1105 is unknown error. Will
+		// merge with sqlconn later.
+		unknow := SQLErrors[ER_UNKNOWN_ERROR]
+		return &SQLError{
+			Num:     unknow.Num,
+			State:   unknow.State,
+			Message: msg,
+		}
+	}
+
+	num, err := strconv.Atoi(match[1])
+	if err != nil {
+		unknow := SQLErrors[ER_UNKNOWN_ERROR]
+		return &SQLError{
+			Num:     unknow.Num,
+			State:   unknow.State,
+			Message: msg,
+		}
+	}
+
+	serr := &SQLError{
+		Num:     uint16(num),
+		State:   match[2],
+		Message: msg,
+	}
+	return serr
 }

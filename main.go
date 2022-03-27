@@ -1,12 +1,11 @@
 package main
 
 import (
-	_ "context"
 	"flag"
 	"fmt"
 	"github.com/zhukovaskychina/xmysql-server/initdb"
 	"github.com/zhukovaskychina/xmysql-server/server/conf"
-	"github.com/zhukovaskychina/xmysql-server/server/innodb/net"
+	"github.com/zhukovaskychina/xmysql-server/server/net"
 	"os"
 	"runtime"
 )
@@ -57,4 +56,5 @@ func main() {
 
 	mysqlServer := net.NewMySQLServer(cfg)
 	mysqlServer.Start()
+
 }

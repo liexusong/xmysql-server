@@ -130,9 +130,9 @@ func ConvertULong8Bytes(i uint64) []byte {
 
 func ConvertBool2Byte(boolValue bool) byte {
 	if boolValue {
-		return 1
+		return 0
 	}
-	return 0
+	return 1
 }
 
 func ConvertUInt4Bytes(i uint32) []byte {

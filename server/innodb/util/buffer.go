@@ -19,7 +19,7 @@ var (
 	ErrIOEOF = io.EOF
 )
 
-// Buffer represents the buffer_pool tuple.
+// Buffer represents the buffer tuple.
 type Buffer struct {
 	pos  int
 	seek int
@@ -27,7 +27,7 @@ type Buffer struct {
 	buf  []byte
 }
 
-// NewBuffer creates a new buffer_pool.
+// NewBuffer creates a new buffer.
 func NewBuffer(cap int) *Buffer {
 	return &Buffer{pos: 0,
 		cap: cap,
@@ -35,7 +35,7 @@ func NewBuffer(cap int) *Buffer {
 	}
 }
 
-// ReadBuffer used to read buffer_pool from datas.
+// ReadBuffer used to read buffer from datas.
 func ReadBuffer(b []byte) *Buffer {
 	return &Buffer{
 		buf: b,
@@ -43,24 +43,24 @@ func ReadBuffer(b []byte) *Buffer {
 	}
 }
 
-// Reset used to reset a buffer_pool.
+// Reset used to reset a buffer.
 func (b *Buffer) Reset(data []byte) {
 	b.buf = data
 	b.pos = len(data)
 	b.seek = 0
 }
 
-// Datas returns the datas of the buffer_pool.
+// Datas returns the datas of the buffer.
 func (b *Buffer) Datas() []byte {
 	return b.buf[:b.pos]
 }
 
-// Length returns the last position of the buffer_pool.
+// Length returns the last position of the buffer.
 func (b *Buffer) Length() int {
 	return b.pos
 }
 
-// Seek returns the seek position of the buffer_pool.
+// Seek returns the seek position of the buffer.
 func (b *Buffer) Seek() int {
 	return b.seek
 }
@@ -368,7 +368,7 @@ func (b *Buffer) ReadString(n int) (s string, err error) {
 	return
 }
 
-// ReadStringNUL reads until the first NUL in the buffer_pool
+// ReadStringNUL reads until the first NUL in the buffer
 // returning a string containing the data up to and not including the NUL
 func (b *Buffer) ReadStringNUL() (s string, err error) {
 	var v []byte
@@ -380,7 +380,7 @@ func (b *Buffer) ReadStringNUL() (s string, err error) {
 	return
 }
 
-// ReadStringEOF reads until the first EOF in the buffer_pool
+// ReadStringEOF reads until the first EOF in the buffer
 // returning a string containing the data up to and not including the EOF
 func (b *Buffer) ReadStringEOF() (s string, err error) {
 	var v []byte
@@ -392,13 +392,13 @@ func (b *Buffer) ReadStringEOF() (s string, err error) {
 	return
 }
 
-// ReadBytesNUL reads until the first NUL in the buffer_pool
+// ReadBytesNUL reads until the first NUL in the buffer
 // returning a byte slice containing the data up to and not including the NUL
 func (b *Buffer) ReadBytesNUL() (v []byte, err error) {
 	return b.readBytesWithToken(0x00)
 }
 
-// ReadBytesEOF reads until the first EOF in the buffer_pool
+// ReadBytesEOF reads until the first EOF in the buffer
 // returning a byte slice containing the data up to and not including the EOF
 func (b *Buffer) ReadBytesEOF() (v []byte, err error) {
 	return b.readBytesWithToken(0xfe)

@@ -1,5 +1,10 @@
 package schemas
 
+import (
+	"github.com/zhukovaskychina/xmysql-server/server/conf"
+	"github.com/zhukovaskychina/xmysql-server/server/innodb/sqlparser"
+)
+
 type Database interface {
 	Name() string
 
@@ -7,7 +12,7 @@ type Database interface {
 
 	ListTables() []Table
 
-	//CreateTable(conf *conf.Cfg, stmt *sqlparser.DDL) (Table, error)
+	CreateTable(conf *conf.Cfg, stmt *sqlparser.DDL) (Table, error)
 
 	DropTable(name string) error
 

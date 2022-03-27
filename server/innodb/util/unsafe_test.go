@@ -81,18 +81,4 @@ func TestToJSONString(t *testing.T) {
 func TestCRC32(t *testing.T) {
 	result := CRC32("HELLO")
 	fmt.Println(result)
-
-	a, b := 10, 0
-	if a < 0 && a/b > 0 {
-		fmt.Println("OK")
-	}
-}
-
-func TestName(t *testing.T) {
-	var i = 16 & 7
-	fmt.Println(i)
-
-	var m = 16 >> 3
-
-	fmt.Println(m)
 }

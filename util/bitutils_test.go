@@ -13,8 +13,11 @@ func TestName(t *testing.T) {
 	intarrays = append(intarrays, 3, 4, 5, 6)
 
 	intarrays = append(intarrays[0:1], intarrays[2:]...)
+	fmt.Println(intarrays)
 	intarrays = append(intarrays[0:1], 2)
 
+	fmt.Println()
+	fmt.Println(intarrays)
 }
 
 func Test_ConvertBytes2BitStrings(t *testing.T) {

@@ -20,7 +20,7 @@ then
 	LDFLAGS="$LDFLAGS $EX_LDFLAGS"
 fi
 
-build(){
+build() {
 	echo "$1 $2 ..."
 	GOOS=$1 GOARCH=$2 go build \
 	  -o dist/xmysql-server-${3:-""} \
@@ -28,6 +28,9 @@ build(){
 		-ldflags "$LDFLAGS" \
 		-gcflags "all=-N -l" \
 /Users/zhukovasky/GolandProjects/xmysql-server/main.go
+
+
+
 }
 
 go generate .
@@ -37,16 +40,3 @@ build darwin amd64 mac-amd64
 #build linux amd64 linux-amd64
 #build linux 386 linux-386
 #build windows amd64 win-amd64.exe
-
-buildClient() {
-  	echo "$1 $2 ..."
-	GOOS=$1 GOARCH=$2 go build \
-	  -o dist/xmysql-server-client-${3:-""} \
-		-tags vfs \
-		-ldflags "$LDFLAGS" \
-		-gcflags "all=-N -l" \
-/Users/zhukovasky/GolandProjects/xmysql-server/client/main.go
-}
-
-
-buildClient darwin amd64 mac-amd64

@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -27,6 +28,7 @@ func ConvertByte2Bits(data byte) string {
 	for i := 0; i < 8; i++ {
 		move := uint(7 - i)
 		result = append(result, string(strconv.Itoa(int((data>>move)&1))))
+		fmt.Println(result)
 	}
 
 	return strings.Join(result, "")

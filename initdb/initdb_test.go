@@ -2,11 +2,11 @@ package initdb
 
 import (
 	"fmt"
-	"github.com/zhukovaskychina/xmysql-server/server/innodb/innodb_store/store/storebytes/table"
+	"github.com/zhukovaskychina/xmysql-server/server/innodb/sqlparser"
+	"github.com/zhukovaskychina/xmysql-server/server/innodb/store/table"
+	"github.com/zhukovaskychina/xmysql-server/util"
 	"strings"
 	"testing"
-
-	"github.com/zhukovaskychina/xmysql-server/util"
 )
 
 func TestInitDBDir(t *testing.T) {

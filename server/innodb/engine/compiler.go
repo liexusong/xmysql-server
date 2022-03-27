@@ -1,38 +1,11 @@
 package engine
 
-import (
-	"github.com/juju/errors"
-	"github.com/zhukovaskychina/xmysql-server/server/innodb/ast"
-	"github.com/zhukovaskychina/xmysql-server/server/innodb/context"
-	"github.com/zhukovaskychina/xmysql-server/server/innodb/plan"
-	"github.com/zhukovaskychina/xmysql-server/server/innodb/resolver"
-	"github.com/zhukovaskychina/xmysql-server/server/innodb/schemas"
-)
-
-// Compile is safe for concurrent use by multiple goroutines.
-func Compile(ctx context.Context, rawStmt ast.StmtNode) (plan.Plan, error) {
-	info := ctx.GetSessionVars().TxnCtx.InfoSchema.(schemas.InfoSchema)
-
-	node := rawStmt
-	err := resolver.ResolveName(node, info, ctx)
-	if err != nil {
-		return nil, errors.Trace(err)
-	}
-	p, err := plan.Optimize(ctx, node, info)
-	if err != nil {
-		return nil, errors.Trace(err)
-	}
-
-	return p, nil
+//用于改写SQL
+type Compiler struct {
 }
 
-type PreparedStatement struct {
-}
+//构造器
+func NewCompiler() *Compiler {
 
-// runStmt executes the ast.Statement and commit or rollback the current transaction.
-func runStmt(ctx context.Context, s ast.Statement) (ast.RecordSet, error) {
-	var err error
-	var rs ast.RecordSet
-	rs, err = s.Exec(ctx)
-	return rs, errors.Trace(err)
+	return nil
 }

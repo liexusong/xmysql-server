@@ -12,13 +12,12 @@ package util
 import (
 	"bytes"
 	crand "crypto/rand"
-	"fmt"
 	"testing"
 )
 
 func TestHashKey(t *testing.T) {
-	a := []byte("a1232")
-	b := []byte("b1232")
+	a := []byte("asdf")
+	b := []byte("asdf")
 	c := []byte("csfd")
 	if !bytes.Equal(a, b) {
 		t.Error("a != b")
@@ -32,14 +31,6 @@ func TestHashKey(t *testing.T) {
 	if hash64a(a) == hash64a(c) {
 		t.Error("hash64a(a) == hash64a(c)")
 	}
-	fmt.Println(hash64a(a))
-	fmt.Println(hash64a(b))
-	fmt.Println(hash64a(a) < hash64a(b))
-	fmt.Println(string(a) < string(b))
-
-	fmt.Println(78 & 63)
-
-	fmt.Println(1 >> 6)
 }
 
 func randSlice(length int) []byte {
